@@ -1,3 +1,4 @@
+# version simplifiee M.H.  Yacinoxe
 FROM ubuntu:20.04
 
 # Variables d’environnement Hadoop
@@ -27,3 +28,4 @@ RUN ssh-keygen -t rsa -P '' -f /root/.ssh/id_rsa \
 WORKDIR $HADOOP_HOME
 
 CMD ["bash"]
+
