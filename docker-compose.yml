@@ -1,0 +1,33 @@
+version: "3"
+networks:
+  hadoop:
+    driver: bridge
+
+services:
+  hadoop-master:
+    build: .
+    container_name: hadoop-master
+    hostname: hadoop-master
+    ports:
+      - "9870:9870"   # HDFS NameNode UI
+      - "8088:8088"   # YARN ResourceManager UI
+      - "9000:9000"   # HDFS
+    networks:
+      - hadoop
+    command: bash -c "service ssh start && /bin/bash"
+
+  hadoop-worker1:
+    build: .
+    container_name: hadoop-worker1
+    hostname: hadoop-worker1
+    networks:
+      - hadoop
+    command: bash -c "service ssh start && /bin/bash"
+
+  hadoop-worker2:
+    build: .
+    container_name: hadoop-worker2
+    hostname: hadoop-worker2
+    networks:
+      - hadoop
+    command: bash -c "service ssh start && /bin/bash"
