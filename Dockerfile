@@ -48,4 +48,6 @@ RUN ssh-keygen -t rsa -P '' -f /root/.ssh/id_rsa && \
 WORKDIR $HADOOP_HOME
 
 # Lancer le service SSH puis ouvrir un shell
-CMD [ "sh", "-c", "service ssh start; bash"]
+
+#CMD [ "sh", "-c", "service ssh start; bash"]
+CMD [ "sh", "-c", "service ssh start && tail -f /dev/null"]
