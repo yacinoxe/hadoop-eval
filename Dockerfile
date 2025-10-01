@@ -19,7 +19,8 @@ RUN wget https://downloads.apache.org/hadoop/common/hadoop-3.3.6/hadoop-3.3.6.ta
     && rm hadoop-3.3.6.tar.gz
  
 # Copier la config préparée
-#COPY config/* $HADOOP_HOME/etc/hadoop/
+COPY config/* $HADOOP_HOME/etc/hadoop/
+COPY config/* /tmp/
 RUN mv /tmp/ssh_config ~/.ssh/config && \
     mv /tmp/hadoop-env.sh /usr/local/hadoop/etc/hadoop/hadoop-env.sh && \
     mv /tmp/hdfs-site.xml $HADOOP_HOME/etc/hadoop/hdfs-site.xml && \
@@ -47,3 +48,4 @@ WORKDIR $HADOOP_HOME
 #CMD ["bash"]
 # Lance le service SSH  Ouvre un shell interactif bash
 CMD [ "sh", "-c", "service ssh start; bash"]
+
