@@ -1,53 +1,57 @@
-# version simplifiée M.H.  Yacinoxe
+# Base Ubuntu
 FROM ubuntu:20.04
 
-# Variables d’environnement Hadoop
+# Variables d'environnement
 ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
 ENV HADOOP_HOME=/usr/local/hadoop
-ENV PATH=$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin
 ENV SPARK_HOME=/usr/local/spark
+ENV HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
+ENV YARN_CONF_DIR=$HADOOP_HOME/etc/hadoop
+ENV PATH=$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin:$SPARK_HOME/bin
 
-# Installer dépendances (Java + SSH)
+WORKDIR /root
+
+# Installer dépendances
 RUN apt-get update && apt-get install -y \
-    openjdk-8-jdk \
-    ssh rsync vim curl wget \
+    openjdk-8-jdk ssh rsync wget curl vim python3 python3-dev python3-distutils libssl-dev libffi-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Télécharger et installer Hadoop
-RUN wget https://downloads.apache.org/hadoop/common/hadoop-3.3.6/hadoop-3.3.6.tar.gz \
-    && tar -xvzf hadoop-3.3.6.tar.gz \
-    && mv hadoop-3.3.6 $HADOOP_HOME \
-    && rm hadoop-3.3.6.tar.gz
+# Installer Hadoop
+RUN wget https://archive.apache.org/dist/hadoop/common/hadoop-3.3.6/hadoop-3.3.6.tar.gz && \
+    tar -xzf hadoop-3.3.6.tar.gz && \
+    mv hadoop-3.3.6 /usr/local/hadoop && \
+    rm hadoop-3.3.6.tar.gz
 
-# Créer le dossier .ssh
-RUN mkdir -p /root/.ssh
+# Installer Spark
+RUN wget https://archive.apache.org/dist/spark/spark-3.5.0/spark-3.5.0-bin-hadoop3.tgz && \
+    tar -xzf spark-3.5.0-bin-hadoop3.tgz && \
+    mv spark-3.5.0-bin-hadoop3 /usr/local/spark && \
+    rm spark-3.5.0-bin-hadoop3.tgz
 
-# Copier les fichiers de config Hadoop et SSH
-COPY config/ssh_config /root/.ssh/config
-COPY config/hadoop-env.sh $HADOOP_HOME/etc/hadoop/hadoop-env.sh
-COPY config/hdfs-site.xml $HADOOP_HOME/etc/hadoop/hdfs-site.xml
-COPY config/core-site.xml $HADOOP_HOME/etc/hadoop/core-site.xml
-COPY config/mapred-site.xml $HADOOP_HOME/etc/hadoop/mapred-site.xml
-COPY config/yarn-site.xml $HADOOP_HOME/etc/hadoop/yarn-site.xml
-COPY config/workers $HADOOP_HOME/etc/hadoop/workers
+# SSH sans mot de passe pour Hadoop
+RUN ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa && \
+    cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys && \
+    chmod 0600 ~/.ssh/authorized_keys
 
-# Copier les scripts
-COPY config/start-hadoop.sh /root/start-hadoop.sh
-COPY config/run-wordcount.sh /root/run-wordcount.sh
+# Créer répertoires HDFS
+RUN mkdir -p ~/hdfs/namenode ~/hdfs/datanode
+RUN mkdir -p $HADOOP_HOME/logs
 
-# Config Spark
-COPY config/spark-defaults.conf $SPARK_HOME/conf/spark-defaults.conf
+# Copier configs et scripts
+COPY config/* /tmp/
 
+RUN mv /tmp/hadoop-env.sh $HADOOP_HOME/etc/hadoop/hadoop-env.sh && \
+    mv /tmp/core-site.xml $HADOOP_HOME/etc/hadoop/core-site.xml && \
+    mv /tmp/hdfs-site.xml $HADOOP_HOME/etc/hadoop/hdfs-site.xml && \
+    mv /tmp/mapred-site.xml $HADOOP_HOME/etc/hadoop/mapred-site.xml && \
+    mv /tmp/yarn-site.xml $HADOOP_HOME/etc/hadoop/yarn-site.xml && \
+    mv /tmp/workers $HADOOP_HOME/etc/hadoop/workers && \
+    mv /tmp/log4j.properties $HADOOP_HOME/etc/hadoop/log4j.properties && \
+    mv /tmp/start-hadoop.sh ~/start-hadoop.sh && \
+    chmod +x ~/start-hadoop.sh
 
+# Format NameNode (si jamais c’est la première fois)
+RUN $HADOOP_HOME/bin/hdfs namenode -format -force
 
-# Activer SSH sans mot de passe
-RUN ssh-keygen -t rsa -P '' -f /root/.ssh/id_rsa && \
-    cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys && \
-    chmod 0600 /root/.ssh/authorized_keys
-
-WORKDIR $HADOOP_HOME
-
-# Lancer le service SSH puis ouvrir un shell
-
-#CMD [ "sh", "-c", "service ssh start; bash"]
-CMD [ "sh", "-c", "service ssh start && tail -f /dev/null"]
+# Démarrer SSH et garder le container actif
+CMD ["sh", "-c", "service ssh start; bash"]
