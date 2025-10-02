@@ -6,7 +6,7 @@ networks:
 
 services:
   hadoop-master:
-    build: .
+    
     image: hadoop-eval
     container_name: hadoop-master
     hostname: hadoop-master
@@ -40,4 +40,5 @@ services:
       - "8041:8042"
     networks:
       - hadoop_eval
+
 
