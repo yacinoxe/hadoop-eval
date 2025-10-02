@@ -1,4 +1,5 @@
-version: "3"
+version: "3.8"
+
 networks:
   hadoop:
     driver: bridge
@@ -11,23 +12,28 @@ services:
     ports:
       - "9870:9870"   # HDFS NameNode UI
       - "8088:8088"   # YARN ResourceManager UI
-      - "9000:9000"   # HDFS
+      - "7077:7077"   # Spark Master
+      - "9000:9000"   # HDFS port
     networks:
-      - hadoop
-    command: bash -c "service ssh start && /bin/bash"
+      - hadoop_eval
+    depends_on:
+      - hadoop-worker1
+      - hadoop-worker2
 
   hadoop-worker1:
     build: .
     container_name: hadoop-worker1
     hostname: hadoop-worker1
+    ports:
+      - "8040:8042"
     networks:
-      - hadoop
-    command: bash -c "service ssh start && /bin/bash"
+      - hadoop_eval
 
   hadoop-worker2:
     build: .
     container_name: hadoop-worker2
     hostname: hadoop-worker2
+    ports:
+      - "8041:8042"
     networks:
-      - hadoop
-    command: bash -c "service ssh start && /bin/bash"
+      - hadoop_eval
