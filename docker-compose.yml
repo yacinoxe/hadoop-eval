@@ -5,41 +5,45 @@ networks:
     driver: bridge
 
 services:
-  hadoop-master:
+  master:
     
     image: hadoop-eval
-    container_name: hadoop-master
-    hostname: hadoop-master
+    container_name: master
+    hostname: master
     ports:
       - "9870:9870"   # HDFS NameNode UI
       - "8088:8088"   # YARN ResourceManager UI
       - "7077:7077"   # Spark Master
       - "9000:9000"   # HDFS port
+     command: ["tail", "-f", "/dev/null"]
     networks:
       - hadoop_eval
     depends_on:
-      - hadoop-worker1
-      - hadoop-worker2
+      - slave1
+      - slave2
 
-  hadoop-worker1:
+  slave1:
  ]
     image: hadoop-eval
-    container_name: hadoop-worker1
-    hostname: hadoop-worker1
+    container_name: slave1
+    hostname: slave1
     ports:
       - "8040:8042"
+     command: ["tail", "-f", "/dev/null"]
     networks:
       - hadoop_eval
 
-  hadoop-worker2:
+  slave2:
    ]
     image: hadoop-eval
-    container_name: hadoop-worker2
-    hostname: hadoop-worker2
+    container_name: slave2
+    hostname: slave2
     ports:
       - "8041:8042"
+    command: ["tail", "-f", "/dev/null"]
     networks:
       - hadoop_eval
+
 
 
 
