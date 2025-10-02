@@ -7,6 +7,7 @@ networks:
 services:
   hadoop-master:
     build: .
+    image: hadoop-eval
     container_name: hadoop-master
     hostname: hadoop-master
     ports:
@@ -21,7 +22,8 @@ services:
       - hadoop-worker2
 
   hadoop-worker1:
-    build: .
+ ]
+    image: hadoop-eval
     container_name: hadoop-worker1
     hostname: hadoop-worker1
     ports:
@@ -30,10 +32,12 @@ services:
       - hadoop_eval
 
   hadoop-worker2:
-    build: .
+   ]
+    image: hadoop-eval
     container_name: hadoop-worker2
     hostname: hadoop-worker2
     ports:
       - "8041:8042"
     networks:
       - hadoop_eval
+
