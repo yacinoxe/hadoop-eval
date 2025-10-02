@@ -23,7 +23,7 @@ services:
       - slave2
 
   slave1:
- ]
+ 
     image: hadoop-eval
     container_name: slave1
     hostname: slave1
@@ -34,7 +34,7 @@ services:
       - hadoop_eval
 
   slave2:
-   ]
+   
     image: hadoop-eval
     container_name: slave2
     hostname: slave2
@@ -43,6 +43,7 @@ services:
     command: ["tail", "-f", "/dev/null"]
     networks:
       - hadoop_eval
+
 
 
 
