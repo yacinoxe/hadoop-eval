@@ -1,7 +1,7 @@
 version: "3.8"
 
 networks:
-  hadoop:
+  hadoop_eval:
     driver: bridge
 
 services:
@@ -40,5 +40,6 @@ services:
       - "8041:8042"
     networks:
       - hadoop_eval
+
 
 
