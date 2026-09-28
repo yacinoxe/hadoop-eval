@@ -20,4 +20,4 @@ Le docker-compose.yml Automatise le lancement d’un mini cluster Big Data compl
 Le master gère les métadonnées, Spark master, Kafka broker et HBase master.
 Les workers exécutent les tâches (HDFS Datanodes + YARN NodeManagers).
 Tous sont reliés via le réseau hadoop.
-** Ces contenaires ont été initialement issus de kiwenlau/hadoop-cluster-docker , Un grand merci @ kiwenlau & Lilia
+
